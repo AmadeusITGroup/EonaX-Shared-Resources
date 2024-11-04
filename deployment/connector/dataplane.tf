@@ -9,16 +9,21 @@ resource "helm_release" "dataplane" {
   cleanup_on_fail   = true
   dependency_update = true
   recreate_pods     = true
-  chart             = "./dataplane.tgz"
+  chart             = "../../charts/dataplane-0.2.4.tgz"
 
   values = [
     yamlencode({
       "dataplane" : {
         "image" : {
-          "repository" : "eonax-data-plane-postgresql-hashicorpvault"
+          "repository" : "localhost/eonax-data-plane-postgresql-hashicorpvault"
           "tag" : "latest"
           "pullPolicy" : "Never"
         },
+        "service" = {
+          "labels" = {
+            "prometheus.io/scrape-eonax" = var.telemetry_enabled ? "true" : "false"
+          }
+        }
         "keys" : {
           // use the same key pair for simplicity
           "dataplane" : {
@@ -26,7 +31,6 @@ resource "helm_release" "dataplane" {
             "publicKeyVaultAlias" : var.public_key_alias
           }
         }
-
         "logging" : <<EOT
         .level=INFO
         org.eclipse.edc.level=ALL
@@ -35,7 +39,17 @@ resource "helm_release" "dataplane" {
         java.util.logging.ConsoleHandler.level=ALL
         java.util.logging.SimpleFormatter.format=[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS] [%4$-7s] %5$s%6$s%n
                EOT
-
+        "opentelemetry" : <<EOT
+otel.javaagent.enabled=${var.telemetry_enabled}
+otel.javaagent.debug=false
+otel.exporter.otlp.protocol=grpc
+otel.exporter.otlp.endpoint=http://eonax-otel-collector:4317
+otel.exporter.otlp.headers=tenant_id=dataplane
+otel.service.name=dataplane
+otel.metrics.exporter=prometheus
+otel.instrumentation.default.enabled=false
+otel.instrumentation.micrometer.enabled=true
+    EOT
         "config" : <<EOT
 edc.vault.hashicorp.token.scheduled-renew-enabled=false
 edc.dataplane.state-machine.iteration-wait-millis=${var.data_plane_state_machine_wait_millis}
@@ -52,10 +66,13 @@ edc.dataplane.state-machine.iteration-wait-millis=${var.data_plane_state_machine
             {
               "port" : 8181,
               "path" : "/dp/(public)(.*)"
+              "pathType": "ImplementationSpecific"
             },
             {
               "port" : 8282,
               "path" : "/dp/(data)(.*)"
+              "pathType": "ImplementationSpecific"
+
             }
           ]
         },

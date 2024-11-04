@@ -46,7 +46,7 @@ cd connector
 
 ```bash
 EDC_VERSION=0.9.1
-EONAX_VERSION=0.2.2
+EONAX_VERSION=0.2.4
 ```
 
 ### Login to the Docker registry

@@ -79,3 +79,38 @@ variable "data_plane_state_machine_wait_millis" {
   description = "(Optional) Wait time of the data plane state machines in milliseconds"
   default     = 5000
 }
+
+variable "opensearch_stack_enabled" {
+  default     = true
+  description = "(Required) Whether the elastic stack must be deployed"
+}
+
+variable "tempo_stack_enabled" {
+  default     = true
+  description = "(Required) Whether the tempo stack must be deployed"
+}
+
+variable "prometheus_stack_enabled" {
+  default     = true
+  description = "(Required) Whether the prometheus stack must be deployed"
+}
+
+variable "loki_enabled" {
+  default     = true
+  description = "(Required) Whether the loki must be deployed"
+}
+
+variable "grafana_enabled" {
+  default     = true
+  description = "(Required) Whether grafana dashboard must be deployed"
+}
+
+variable "k8s-dashboard_enabled" {
+  default     = true
+  description = "(Required) Whether kubeneretes dashboard must be deployed"
+}
+
+variable "telemetry_enabled" {
+  description = "(Required) Telemetry enabled"
+  type        = bool
+}

@@ -7,16 +7,21 @@ resource "helm_release" "identity-hub" {
   cleanup_on_fail   = true
   dependency_update = true
   recreate_pods     = true
-  chart             = "./identityhub.tgz"
+  chart             = "../../charts/identityhub-0.2.4.tgz"
 
   values = [
     yamlencode({
       "identityhub" : {
         "image" : {
-          "repository" : "eonax-identity-hub-postgresql-hashicorpvault"
+          "repository" : "localhost/eonax-identity-hub-postgresql-hashicorpvault"
           "tag" : "latest"
           "pullPolicy" : "Never"
         },
+        "service" = {
+          "labels" = {
+            "prometheus.io/scrape-eonax" = var.telemetry_enabled ? "true" : "false"
+          }
+        }
         "keys" : {
           "sts" : {
             "publicKeyVaultAlias" : var.public_key_alias
@@ -31,6 +36,17 @@ resource "helm_release" "identity-hub" {
         "config" : <<EOT
 edc.vault.hashicorp.token.scheduled-renew-enabled=false
         EOT
+        "opentelemetry" : <<EOT
+otel.javaagent.enabled=${var.telemetry_enabled}
+otel.javaagent.debug=false
+otel.exporter.otlp.protocol=grpc
+otel.exporter.otlp.endpoint=http://eonax-otel-collector:4317
+otel.exporter.otlp.headers=tenant_id=identityhub
+otel.service.name=identityhub
+otel.metrics.exporter=prometheus
+otel.instrumentation.default.enabled=false
+otel.instrumentation.micrometer.enabled=true
+    EOT
         "postgresql" : {
           "jdbcUrl" : "jdbc:postgresql://${var.db_server_fqdn}/${var.db_name}",
           "credentials" : {
@@ -51,14 +67,17 @@ edc.vault.hashicorp.token.scheduled-renew-enabled=false
             {
               "port" : 8181,
               "path" : "/ih/(identity)(.*)"
+              "pathType": "ImplementationSpecific"
             },
             {
               "port" : 8282,
               "path" : "/ih/(resolution)(.*)"
+              "pathType": "ImplementationSpecific"
             },
             {
               "port" : 8383,
               "path" : "/ih/(did)(.*)"
+              "pathType": "ImplementationSpecific"
             }
           ]
         },
@@ -82,7 +101,6 @@ edc.vault.hashicorp.token.scheduled-renew-enabled=false
         java.util.logging.SimpleFormatter.format=[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS] [%4$-7s] %5$s%6$s%n
                EOT
       }
-
     })
   ]
 

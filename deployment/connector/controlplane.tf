@@ -7,16 +7,21 @@ resource "helm_release" "controlplane" {
   cleanup_on_fail   = true
   dependency_update = true
   recreate_pods     = true
-  chart             = "./controlplane.tgz"
+  chart             = "../../charts/controlplane-0.2.4.tgz"
 
   values = [
     yamlencode({
       "controlplane" : {
         "image" : {
-          "repository" : "eonax-control-plane-postgresql-hashicorpvault"
+          "repository" : "localhost/eonax-control-plane-postgresql-hashicorpvault"
           "tag" : "latest"
           "pullPolicy" : "Never"
         },
+        "service" = {
+          "labels" = {
+            "prometheus.io/scrape-eonax" = var.telemetry_enabled ? "true" : "false"
+          }
+        }
         "keys" : {
           "sts" : {
             "privateKeyVaultAlias" : var.private_key_alias,
@@ -42,14 +47,23 @@ resource "helm_release" "controlplane" {
         java.util.logging.ConsoleHandler.level=ALL
         java.util.logging.SimpleFormatter.format=[%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS] [%4$-7s] %5$s%6$s%n
                EOT
-
         "config" : <<EOT
 edc.vault.hashicorp.token.scheduled-renew-enabled=false
 edc.negotiation.state-machine.iteration-wait-millis=${var.negotiation_state_machine_wait_millis}
 edc.transfer.state-machine.iteration-wait-millis=${var.transfer_state_machine_wait_millis}
 edc.policy.monitor.state-machine.iteration-wait-millis=${var.policy_monitor_state_machine_wait_millis}
         EOT
-
+        "opentelemetry" : <<EOT
+otel.javaagent.enabled=${var.telemetry_enabled}
+otel.javaagent.debug=false
+otel.exporter.otlp.protocol=grpc
+otel.exporter.otlp.endpoint=http://eonax-otel-collector:4317
+otel.exporter.otlp.headers=tenant_id=controlplane
+otel.service.name=controlplane
+otel.metrics.exporter=prometheus
+otel.instrumentation.default.enabled=false
+otel.instrumentation.micrometer.enabled=true
+    EOT
         "ingress" : {
           "enabled" : true
           "className" : "nginx"
@@ -62,10 +76,12 @@ edc.policy.monitor.state-machine.iteration-wait-millis=${var.policy_monitor_stat
             {
               "port" : 8181,
               "path" : "/cp/(management)(.*)"
+              "pathType": "ImplementationSpecific"
             },
             {
               "port" : 8282,
               "path" : "/cp/(dsp)(.*)"
+              "pathType": "ImplementationSpecific"
             }
           ]
         },

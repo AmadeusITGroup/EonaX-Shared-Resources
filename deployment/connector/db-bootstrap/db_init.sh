@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 echo "Create user $DB_USER"
 psql -v ON_ERROR_STOP=1 -h $DB_FQDN --username $POSTGRES_USER --dbname $POSTGRES_DB -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD'"
