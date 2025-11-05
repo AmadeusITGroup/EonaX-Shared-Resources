@@ -13,6 +13,68 @@ In order to complete this guide, you will need few infos that will be provided b
 - a token for authenticating to your respective connector APIs
 - a token for authenticating to the dataspace federated catalog
 
+## JWT Token Generation with Postman (PKCE Authentication)
+
+Follow these steps to configure JWT token authentication in Postman:
+
+### Step 1: Configure OAuth 2.0 in Postman
+
+1. **Open Postman Authorization Tab**
+   - Navigate to your collection or request
+   - Click on the "Authorization" tab
+   - Select "OAuth 2.0" from the Type dropdown
+
+   ![Postman OAuth 2.0 Selection](examples-jwt/Authorization_tab.png)
+### Step 2: Configure PKCE Authentication
+
+2. **Choose Authorization Code (With PKCE)**
+   - Set Grant Type to "Authorization Code (With PKCE)"
+   - Configure the following parameters:
+     - **Auth URL**: `https://your-auth-server.com/oauth/authorize`
+     - **Access Token URL**: `https://your-auth-server.com/oauth/token`
+     - **Client ID**: Your registered application client ID (provided by Amadeus)
+     - **Client Secret**: Your registered application client Secret (provided by Amadeus)
+     - **Code Challenge Method**: `SHA256`
+     - **Scope**: Required scopes (e.g., `connector:read connector:write catalog:read`)
+
+   ![Postman PKCE Configuration](examples-jwt/configure_new_token.png)
+### Step 3: Generate Access Token
+
+3. **Initiate Token Generation**
+   - Click "Get New Access Token" to start the authentication flow
+
+   ![Get New Access Token](examples-jwt/Get_New_Access_Token.png)
+### Step 4: Browser Authentication
+
+4. **Complete Authentication in Browser**
+   - Postman will open a browser window for authentication
+   - Log in with your EonaX credentials
+   - Authorize the application access
+
+   ![Browser Authentication Page 1](examples-jwt/redirect.png)
+   ![Browser Authentication Page 2](examples-jwt/authentication_complete.png)
+### Step 5: Token Generated
+
+5. **JWT Token Ready**
+   - After successful authentication, the JWT token will be automatically generated
+   - The token will be available in Postman for use in API requests
+   - Token refresh will be handled automatically by Postman
+    ![Token Generated](examples-jwt/token_generated.png)
+### Before (API Key - Deprecated)
+```http
+GET /management/v3/assets
+Host: <CONNECTOR_URL>
+x-api-key: your-static-api-key
+Content-Type: application/json
+```
+
+### After (JWT Token - Required)
+```http
+GET /management/v3/assets
+Host: <CONNECTOR_URL>
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
 ## Steps for a participant to create a new dataset
 
 All queries detailed in this section are based on
