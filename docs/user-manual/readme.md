@@ -29,13 +29,13 @@ Follow these steps to configure JWT token authentication in Postman:
 
 2. **Choose Authorization Code (With PKCE)**
    - Set Grant Type to "Authorization Code (With PKCE)"
-   - Configure the following parameters:
-     - **Auth URL**: `https://your-auth-server.com/oauth/authorize`
-     - **Access Token URL**: `https://your-auth-server.com/oauth/token`
-     - **Client ID**: Your registered application client ID (provided by Amadeus)
-     - **Client Secret**: Your registered application client Secret (provided by Amadeus)
+   - Configure the following parameters (provided by Amadeus):,
+     - **Auth URL**: `https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/authorize`
+     - **Access Token URL**: `https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/token`
+     - **Client ID**: Your registered application client ID 
+     - **Client Secret**: Your registered application client Secret 
      - **Code Challenge Method**: `SHA256`
-     - **Scope**: Required scopes (e.g., `connector:read connector:write catalog:read`)
+     - **Scope**: Required scopes
 
    ![Postman PKCE Configuration](examples-jwt/configure_new_token.png)
 ### Step 3: Generate Access Token
