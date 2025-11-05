@@ -82,7 +82,7 @@ the [Swagger specification](https://eclipse-edc.github.io/Connector/openapi/mana
 the EDC
 connector.
 
-They require a `x-api-key` header in input containing the token provided by Amadeus to interact with your connector.
+They require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact with your connector.
 
 ### Create dataset
 
@@ -397,7 +397,8 @@ definition:
 ## Dataset discovery
 
 This section is not correlated with the first one, i.e. we are not using the dataset created in the first section.
-All APIs from this section requires a x-api-key header in input containing the token provided by Amadeus to interact
+
+All APIs from this section require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact
 with the dataspace federated catalog.
 
 ### Federated catalog
@@ -484,7 +485,8 @@ finally how to consume the data represented by this dataset.
 
 This section is not correlated with the first one, i.e. we are not using the dataset created in the first section.
 All queries detailed in this section are based on the Swagger specification of the Management API of the EDC connector.
-All APIs from this section requires a `x-api-key` header in input containing the token provided by Amadeus to interact
+
+All APIs from this section require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact
 with your connector.
 
 ### Contract negotiation
@@ -712,7 +714,7 @@ This is achieved by targeting a proxy API of the consumer Data Plane, that enabl
 request. These query/path parameters are then forwarded to the provider Data Plane, which finally send them to the
 actual data source.
 
-All APIs from this section requires a `x-api-key` header in input containing the token provided by Amadeus to interact
+All APIs from this section require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact
 with your connector. You must also provide the contract id obtained in the previous section in the `Contract-Id` header.
 
 #### Url
