@@ -10,10 +10,20 @@ In order to complete this guide, you will need few infos that will be provided b
 
 - the base url for targeting your respective connector, referred as `<CONNECTOR_URL>` hereafter,
 - the base url for targeting the federated catalog, referred as `<CATALOG_URL>` hereafter,
-- a token for authenticating to your respective connector APIs
-- a token for authenticating to the dataspace federated catalog
+- OAuth 2.0 credentials (Client ID, Client Secret, Auth URL, Access Token URL, and required scopes) for JWT token authentication to your respective connector APIs and the dataspace federated catalog
 
-## JWT Token Generation with Postman (PKCE Authentication)
+## About This Guide
+
+This guide is intended for **dataset providers** , **dataset consumers** and **developers** who need to interact with the EonaX Connector APIs. By following this documentation, you will learn how to:
+
+- Generate JWT tokens using OAuth 2.0 with PKCE authentication in Postman
+- Create and manage datasets, policies, and contracts in the EonaX dataspace
+- Negotiate contracts and transfer data between participants
+- Consume data from other participants in the dataspace
+
+The guide assumes basic familiarity with REST APIs and authentication concepts. All necessary credentials and configuration details will be provided by Amadeus.
+
+## JWT Token Generation with Postman [(PKCE Authentication)](https://blog.postman.com/what-is-pkce/)
 
 Follow these steps to configure JWT token authentication in Postman:
 
@@ -751,3 +761,21 @@ proxying of query/path parameters for this dataset), e.g. `<CONNECTOR_URL>/dp/da
 | Le Petit Fute                                                       | petitfute                 |
 | Atout France                                                        | atoutfrance               |
 | Metropole De Nice                                                   | metropoledenice           |
+
+## ⚠️ DEPRECATED: API Key Authentication Method
+
+> **WARNING**: The following authentication method using `x-api-key` header is **DEPRECATED** and will be removed in a future release.
+>
+> **Please migrate to JWT token authentication** as documented in the main sections above.
+>
+> **Deprecation Notice**: This section is maintained for reference only for users who have not yet migrated.
+
+### Deprecated API Key Usage
+
+The old authentication method used a static API key:
+
+```http
+POST /cp/mgmt/v3/assets
+Host: <CONNECTOR_URL>
+x-api-key: your-static-api-key
+Content-Type: application/json
