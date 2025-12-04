@@ -55,21 +55,15 @@ Contact Eona-X with your **participant name** and **decentralized identifier (DI
 
 #### 3. Install the Ingress Controller
 
-#### 4. Export EONAX_VERSION variable
-```bash
-export EONAX_VERSION=X.Y.Z
-```
+#### 4. Deploy HashiCorp Vault and PostgreSQL Database
 
-#### 5. Deploy HashiCorp Vault and PostgreSQL Database
+#### 5. Navigate to the Connector folder
 
-#### 6. Navigate to the Connector folder
+#### 6. Pull Helm charts and Docker images
 
+#### 7. Expose routes over the internet
 
-#### 7. Pull Helm charts and Docker images
-
-#### 8. Expose routes over the internet
-
-#### 9. Set environment variables
+#### 8. Set environment variables
 
 Setup the following local connector variables:
 - DID_WEB
@@ -82,9 +76,9 @@ Setup the following Platform/Eona-x variables:
 - EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
 
 
-#### 10. Create `terraform.tfvars`
+#### 9. Create `terraform.tfvars`
 
-#### 11. Deploy connector
+#### 10. Deploy connector
 
 After this, you should have the connector and its services up and running.
 
@@ -147,6 +141,6 @@ curl -X POST -H "Content-Type: application/json" -d "$(cat <<EOF
     ]
 }
 EOF
-)" http:///<identityhub-host-url>/ih/identity/v1alpha/participants/$DID_WEB_BASE64_URL/credentials/request
+)" http:///$IH_PRESENTATION_URL/ih/identity/v1alpha/participants/$DID_WEB_BASE64_URL/credentials/request
 
 ---
