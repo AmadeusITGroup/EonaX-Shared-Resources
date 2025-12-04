@@ -51,7 +51,7 @@ Contact Eona-X with your **participant name** and **decentralized identifier (DI
 
 #### 1. Download the Connector Docker Image and store it in the Participant Infrastructure
 
-#### 2. Create a kind Kubernetes cluster
+#### 2. Create a Kubernetes cluster
 
 #### 3. Install the Ingress Controller
 
@@ -73,7 +73,10 @@ Setup the following local connector variables:
 - DP_PUBLIC_URL
 
 Setup the following Platform/Eona-x variables:
-- EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
+- If test environement:
+  EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
+- if prod environement:
+  EONAX_DID_WEB=did:web:api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
 
 
 #### 9. Create `terraform.tfvars`
