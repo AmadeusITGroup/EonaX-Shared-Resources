@@ -118,7 +118,7 @@ curl -X POST -H "Content-Type: application/json" -d "$(cat <<EOF
   ]
 }
 EOF
-  )" http://<identityhub-host-url>/ih/identity/v1alpha/participants
+  )" http://$IH_PRESENTATION_URL/ih/identity/v1alpha/participants
 
 ```
 
