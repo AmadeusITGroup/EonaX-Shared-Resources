@@ -72,10 +72,11 @@ Setup the following local connector variables:
 - CP_DSP_URL
 - DP_PUBLIC_URL
 
-Setup the following Platform/Eona-x variables:
-- If test environement:
+Setup the following Platform/Eona-X variables:
+- If test environment:
   EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
-- if prod environement:
+
+- If prod environment:
   EONAX_DID_WEB=did:web:api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
 
 
