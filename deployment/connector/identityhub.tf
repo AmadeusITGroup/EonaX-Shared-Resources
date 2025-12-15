@@ -1,5 +1,11 @@
 locals {
   identityhub_release_name = "identityhub"
+  did_url                  = "did:web:${local.identityhub_release_name}%3A8383:api:did"
+  
+  sts_port                = 8484
+  sts_path                = "/api/sts"
+  sts_url                 = "http://${local.identityhub_release_name}:${local.sts_port}${local.sts_path}/token"
+  sts_client_secret_alias = "${local.did_url}-sts-client-secret"
 }
 
 resource "helm_release" "identity-hub" {
@@ -12,6 +18,7 @@ resource "helm_release" "identity-hub" {
   values = [
     yamlencode({
       "identityhub" : {
+        "initContainers" : [],
         "image" : {
           "repository" : "eonax-identity-hub-postgresql-hashicorpvault"
           "tag" : "latest"

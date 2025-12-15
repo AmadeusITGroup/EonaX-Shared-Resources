@@ -12,16 +12,18 @@ resource "helm_release" "controlplane" {
   values = [
     yamlencode({
       "controlplane" : {
+        "initContainers" : [],
         "image" : {
-          "repository" : "eonax-control-plane-postgresql-hashicorpvault"
+          # "repository" : "eonax-control-plane-postgresql-hashicorpvault"
+          # "pullPolicy" : "Never"
+        //? "repository" : local.control_plane_image
+        // ? "pullPolicy" : var.environment == "local" ? "Never" : "IfNotPresent"
           "tag" : "latest"
-          "pullPolicy" : "Never"
         },
-        "keys" : {
-          "sts" : {
-            "privateKeyVaultAlias" : var.private_key_alias,
-            "publicKeyId" : "${var.identity_hub_did_web_url}#my-key"
-          }
+       "sts" : {
+          "tokenUrl" : local.sts_url // "http://${local.identityhub_release_name}:${local.sts_port}${local.sts_path}/token"
+          "clientId" : local.did_url,  // "did:web:${local.identityhub_release_name}%3A8383:api:did"
+          "clientSecretAlias" : local.sts_client_secret_alias
         },
         "did" : {
           "web" : {
@@ -29,7 +31,11 @@ resource "helm_release" "controlplane" {
             "useHttps" : false
           }
         },
-
+        # "trustedIssuers" : {
+        #   "authority" : {
+        #     # "did" : local.authority_did ??
+        #   }
+        # },
         "url" : {
           "protocol" : var.control_plane_dsp_url
         },
@@ -79,12 +85,18 @@ edc.policy.monitor.state-machine.iteration-wait-millis=${var.policy_monitor_stat
             }
           }
         },
+        "api" : {
+          "cors" : {
+            "enabled" : true
+          }
+        },
         "vault" : {
           "hashicorp" : {
             "url" : var.vault_url
             "token" : {
               "secret" : {
-                "name" : var.vault_token_secret_name
+                "name" : var.vault_token_secret_name,
+                "tokenKey" : "rootToken"
               }
             }
           }
