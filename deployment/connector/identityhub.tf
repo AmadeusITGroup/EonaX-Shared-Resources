@@ -6,6 +6,9 @@ locals {
   sts_path                = "/api/sts"
   sts_url                 = "http://${local.identityhub_release_name}:${local.sts_port}${local.sts_path}/token"
   sts_client_secret_alias = "${local.did_url}-sts-client-secret"
+  did_url_base64_url      = replace(replace(replace(base64encode(local.did_url), "+", "-"), "/", "_"), "=", "")
+  protocol_url = "http://${local.controlplane_release_name}:8282/api/dsp"
+  identityhub_credentials_url = "http://${local.identityhub_release_name}:8282/api/credentials"
 }
 
 resource "helm_release" "identity-hub" {
@@ -26,7 +29,26 @@ resource "helm_release" "identity-hub" {
         },
         "keys" : {
           "sts" : {
-            "publicKeyVaultAlias" : var.public_key_alias
+            "privateKeyAlias" : var.privatekey_alias,
+            "publicKeyAlias" : var.publickey_alias,
+            "publicKeyId" : "${local.did_url}#my-key"
+          }
+        },
+        "participantcontext" : {
+          "superuser" : {
+            "key" : "${local.did_url_base64_url}.root"
+            "services" : jsonencode([
+              {
+                id : "dsp-url"
+                type : "DSPMessaging",
+                serviceEndpoint : local.protocol_url
+              },
+              {
+                id : "credential-service-url"
+                type : "CredentialService",
+                serviceEndpoint : "${local.identityhub_credentials_url}/v1/participants/${local.did_url_base64_url}"
+              }
+            ])
           }
         },
         "did" : {
@@ -62,12 +84,17 @@ edc.vault.hashicorp.token.scheduled-renew-enabled=false
             },
             {
               "port" : 8282,
-              "path" : "/ih/(presentation)(.*)",
+              "path" : "/ih/(credentials)(.*)",
               "pathType" : "ImplementationSpecific"
             },
             {
               "port" : 8383,
               "path" : "/ih/(did)(.*)",
+              "pathType" : "ImplementationSpecific"
+            },
+            {
+              "port" : 8484,
+              "path" : "/ih/(sts)(.*)",
               "pathType" : "ImplementationSpecific"
             }
           ]

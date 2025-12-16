@@ -14,6 +14,7 @@ resource "helm_release" "dataplane" {
   values = [
     yamlencode({
       "dataplane" : {
+        "initContainers" : [],
         "image" : {
           "repository" : "eonax-data-plane-postgresql-hashicorpvault"
           "tag" : "latest"
@@ -30,8 +31,8 @@ resource "helm_release" "dataplane" {
         "keys" : {
           // use the same key pair for simplicity
           "dataplane" : {
-            "privateKeyVaultAlias" : var.private_key_alias,
-            "publicKeyVaultAlias" : var.public_key_alias
+            "privateKeyVaultAlias" : var.privatekey_alias,
+            "publicKeyVaultAlias" : var.publickey_alias
           }
         }
 

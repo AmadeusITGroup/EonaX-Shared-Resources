@@ -14,11 +14,9 @@ resource "helm_release" "controlplane" {
       "controlplane" : {
         "initContainers" : [],
         "image" : {
-          # "repository" : "eonax-control-plane-postgresql-hashicorpvault"
-          # "pullPolicy" : "Never"
-        //? "repository" : local.control_plane_image
-        // ? "pullPolicy" : var.environment == "local" ? "Never" : "IfNotPresent"
-          "tag" : "latest"
+          "repository" : "eonax-control-plane-postgresql-hashicorpvault"
+          "tag" : "latest",
+          "pullPolicy" : "Never"
         },
        "sts" : {
           "tokenUrl" : local.sts_url // "http://${local.identityhub_release_name}:${local.sts_port}${local.sts_path}/token"
@@ -31,11 +29,12 @@ resource "helm_release" "controlplane" {
             "useHttps" : false
           }
         },
-        # "trustedIssuers" : {
-        #   "authority" : {
-        #     # "did" : local.authority_did ??
-        #   }
-        # },
+        "trustedIssuers" : {
+          "authority" : {
+            "did" : var.eonax_did_web
+            
+          }
+        },
         "url" : {
           "protocol" : var.control_plane_dsp_url
         },
@@ -50,6 +49,7 @@ resource "helm_release" "controlplane" {
                EOT
 
         "config" : <<EOT
+edc.iam.trusted-issuer.authority.id=${var.eonax_did_web}
 edc.vault.hashicorp.token.scheduled-renew-enabled=false
 edc.negotiation.state-machine.iteration-wait-millis=${var.negotiation_state_machine_wait_millis}
 edc.transfer.state-machine.iteration-wait-millis=${var.transfer_state_machine_wait_millis}
@@ -73,6 +73,11 @@ edc.policy.monitor.state-machine.iteration-wait-millis=${var.policy_monitor_stat
             {
               "port" : 8282,
               "path" : "/cp/(dsp)(.*)",
+              "pathType" : "ImplementationSpecific"
+            },
+            {
+              "port" : 8484,
+              "path" : "/cp/(onboarding)(.*)",
               "pathType" : "ImplementationSpecific"
             }
           ]

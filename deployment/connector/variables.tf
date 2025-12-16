@@ -11,6 +11,10 @@ variable "data_plane_public_url" {
   description = "(Required) Internet facing URL of the Data Plane public api"
 }
 
+variable "eonax_did_web" {
+  description = "(Required) did:web url that should resolve to the internet facing url serving the EONAX DID document. Example: did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority"
+}
+
 variable "identity_hub_did_web_url" {
   description = "(Required) did:web url that should resolve to the internet facing url serving the DID document"
 }
@@ -40,12 +44,12 @@ variable "vault_token_secret_name" {
   default     = "vault"
 }
 
-variable "public_key_alias" {
+variable "publickey_alias" {
   description = "(Optional) Alias of the public key in the Vault"
   default     = "public-key"
 }
 
-variable "private_key_alias" {
+variable "privatekey_alias" {
   description = "(Optional) Alias of the private key in the Vault"
   default     = "private-key"
 }
