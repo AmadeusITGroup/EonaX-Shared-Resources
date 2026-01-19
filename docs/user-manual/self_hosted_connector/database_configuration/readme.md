@@ -1,6 +1,6 @@
 # Database configuration
 
-The only supported database so for is PostgreSQL because EDC integrates it.
+PostgreSQL is currently the only supported database, as it is integrated with EDC.
 
 ## Prerequisite
 
