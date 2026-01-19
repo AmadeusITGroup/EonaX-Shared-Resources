@@ -54,7 +54,7 @@ To set it up, either:
 
     - db_name – the name of the database, for example, connectordb
 
-    - db_credentials_secret_name – the Kubernetes secret namem, for example, connectordb created during the prerequisite step
+    - db_credentials_secret_name – the Kubernetes secret name, for example, connectordb created during the prerequisite step
 
         ![database_variables.png](database_variables.png)
 
