@@ -14,7 +14,8 @@ PostgreSQL is the only supported database so far, as it is integrated with EDC.
 
 ## Setting up PostgreSQL in local
 
-This setup is required only when deploying the connector locally. Do not use Terraform to deploy the PostgreSQL database server in a production environment.
+> This setup is required only when deploying the connector locally. Do not use Terraform to deploy the PostgreSQL database server in a production environment.
+
 
 Under [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), go to deployment/storage and execute the below command to start postgreSQL server along with Vault.
 
@@ -44,9 +45,7 @@ The following connector components require a database connection:
 
 - Data Plane
 
-```
-Even if multiple components need access to the database, the configuration only needs to be defined once.
-```
+> Even if multiple components need access to the database, the configuration only needs to be defined once.
 
 To set it up, [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), either:
 
