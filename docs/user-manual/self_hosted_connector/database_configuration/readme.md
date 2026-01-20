@@ -33,7 +33,7 @@ After setting up PostgreSQL locally, you will have the following details:
 - database name: connectordb
 
 
-These details ensure that the connectors can connect to the database successfully.
+These details ensure that the connector can connect to the database successfully.
 
 ## Configuring database details in the connector
 
