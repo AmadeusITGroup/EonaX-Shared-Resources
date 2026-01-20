@@ -47,7 +47,7 @@ The following connector components require a database connection:
 
 > Even if multiple components need access to the database, the configuration only needs to be defined once.
 
-To set it up, [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), either:
+To set it up, under [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), either:
 
 - Go to deployment/connector and update the [variables.tf](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/blob/main/deployment/connector/variables.tf) file by replacing the default values:
 
