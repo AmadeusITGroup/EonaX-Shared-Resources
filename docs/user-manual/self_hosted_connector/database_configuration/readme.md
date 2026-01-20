@@ -2,7 +2,7 @@
 
 PostgreSQL is currently the only supported database, as it is integrated with EDC.
 
-## Prerequisite
+## Prerequisites
 
 - Ensure that a PostgreSQL database is running and accessible so the connector can connect to it.
 
@@ -16,7 +16,7 @@ PostgreSQL is currently the only supported database, as it is integrated with ED
 
 This setup is required only when deploying the connector locally. Do not use Terraform to deploy the PostgreSQL database server in a production environment.
 
-Go to deployment/storage and execute the below command to start postgreSQL server along with Vault.
+Under [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), go to deployment/storage and execute the below command to start postgreSQL server along with Vault.
 
 ```
 terraform init
@@ -44,13 +44,15 @@ The following connector components require a database connection:
 
 - Data Plane
 
+```
 Even if multiple components need access to the database, the configuration only needs to be defined once.
+```
 
-To set it up, either:
+To set it up, [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), either:
 
-- Go to deployment/connector and update the variables.tf file by replacing:
+- Go to deployment/connector and update the variables.tf file by replacing the default values:
 
-    - db_server_fqdn is the fully qualified domain name of the database server, for example, postgresql.
+    - db_server_fqdn is the fully qualified domain name of the database server, for example, postgresql or postgresql.production.com.
 
     - db_name – the name of the database, for example, connectordb
 
@@ -58,13 +60,14 @@ To set it up, either:
 
         ![database_variables.png](database_variables.png)
 
-- Provide values through a .tfvars file for easier management and reuse.
+- or provide values through a .tfvars file for easier management and reuse.
 
     ```
     # terraform.tfvars
 
     # Fully qualified domain name of the database server
     db_server_fqdn = "postgresql"
+    #db_server_fqdn = "postgresql.production.com"
 
     # Name of the database
     db_name = "connectordb"
