@@ -49,9 +49,9 @@ The following connector components require a database connection:
 
 To set it up, [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/tree/main), either:
 
-- Go to deployment/connector and update the variables.tf file by replacing the default values:
+- Go to deployment/connector and update the [variables.tf](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/blob/main/deployment/connector/variables.tf) file by replacing the default values:
 
-    - db_server_fqdn is the fully qualified domain name of the database server, for example, postgresql or postgresql.production.com.
+    - db_server_fqdn - the fully qualified domain name of the database server, for example, postgresql or postgresql.production.com.
 
     - db_name – the name of the database, for example, connectordb
 
@@ -77,7 +77,7 @@ To set it up, [EonaX-Shared-Resources repo](https://github.com/AmadeusITGroup/Eo
     # other configs
     ```
 
-Next, run the Terraform apply command under deployment/connector:
+Finally, run the Terraform apply command under deployment/connector:
 
 - If you are not using a .tfvars file:
     ```
