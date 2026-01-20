@@ -28,7 +28,7 @@ After setting up PostgreSQL locally, you will have the following details:
 
 - db_server_fqdn: postgresql 
 
-- username, password : stored in the Kubernetes secret with the name connectordb
+- username, password: stored in the Kubernetes secret with the name connectordb
 
 - database name: connectordb
 
