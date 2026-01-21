@@ -45,7 +45,7 @@ The EDC connector relies on vault systems to ensure the confidentiality, integri
 
 The EDC connector architecture supports multiple vault implementations through a pluggable extension mechanism. This flexibility allows organizations to choose the vault solution that best fits their infrastructure, security policies, and cloud environment.
 
-Although both HashiCorp Vault and Azure Key Vault are implemented in the Dataspace, Amadeus provides support and operational management only for HashiCorp Vault.
+**Although both HashiCorp Vault and Azure Key Vault are implemented in the Dataspace, Amadeus provides support and operational management only for HashiCorp Vault**.
 
 ### 1. HashiCorp Vault
 
