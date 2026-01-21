@@ -13,7 +13,6 @@ The EDC connector relies on vault systems to ensure the confidentiality, integri
 ### 1. Secrets management
 
 - Secure storage of API keys, tokens, and authentication credentials.
-- Protection of database connection strings and passwords.
 - Management of OAuth2 client secrets and authentication tokens.
 
 ### 2. Cryptographic key management
