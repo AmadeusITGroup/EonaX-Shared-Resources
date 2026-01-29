@@ -53,8 +53,8 @@ EONAX_VERSION=0.4.0
 Use the token provided by Amadeus in order to log to the Docker registry.
 
 ```bash
-GITHUB_TOKEN="<YOUR_TOKEN_HERE>"
-echo $GITHUB_TOKEN | docker login ghcr.io -u amadeusitgroup --password-stdin
+echo $GITHUB_TOKEN | podman login ghcr.io -u amadeusitgroup --password-stdin
+echo $GITHUB_TOKEN | helm registry login ghcr.io -u amadeusitgroup --password-stdin
 ```
 
 ### Pull Helm chart and Docker images
@@ -64,20 +64,31 @@ CLUSTER=eonax-cluster
 DOCKER_IMAGE_REPO=ghcr.io/amadeusitgroup/dataspace_ecosystem
 HELM_CHART_REPO=oci://ghcr.io/amadeusitgroup/dataspace_ecosystem/helm
 
-for i in control-plane data-plane identity-hub; do \
+for i in control-plane data-plane identity-hub telemetry-agent; do \
   image=eonax-$i-postgresql-hashicorpvault; \
-  
+  echo "Processing $image..."; \
   ## pull the Docker image
-  docker pull $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
-  ## tag image with version latest
-  docker tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
-  ## load image to the cluster
-  kind load docker-image $image:latest --name $CLUSTER; \
-  
-  ## pull Helm chart
+  echo "Pulling image: $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION"; \
+  podman pull --tls-verify=false $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
+# ## tag image with version latest
+  echo "Tagging image as $image:latest"; \
+  podman tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
+  ## export image to tar file
+  echo "Exporting image to /tmp/$image.tar"; \
+  podman save -o /tmp/$image.tar $image:latest; \
+  ## load image archive to the cluster
+  echo "Loading image archive into kind cluster: $CLUSTER"; \
+  kind load image-archive /tmp/$image.tar --name $CLUSTER ; \
+  ## verify image is loaded in kind cluster
+  echo "Verifying image is loaded in kind cluster..."; \
+  podman exec -it $CLUSTER-control-plane crictl images | grep $image || echo "WARNING: Image $image not found in kind cluster!"; \
+#     ## pull Helm chart
   chart=${i//-/}; \
+  echo "Pulling Helm chart: $chart version $EONAX_VERSION"; \
   helm pull $HELM_CHART_REPO/$chart --version $EONAX_VERSION; \
   mv $chart-$EONAX_VERSION.tgz $chart.tgz; \
+  echo "Completed processing $image"; \
+  echo "---"; \
 done
 ```
 
