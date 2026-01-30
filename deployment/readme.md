@@ -7,6 +7,7 @@
 - Docker desktop
 - cURL or Postman
 - Hashicorp Vault CLI
+- Cloning the DSE repository: https://github.com/AmadeusITGroup/dataspace-ecosystem/
 
 ## Create a local Kubernetes cluster
 
@@ -30,6 +31,8 @@ kubectl wait --namespace ingress-nginx \
 
 ## Deploy the Vault and DB (optional)
 
+> Take into account that the selfhosted connector has a dependency with the DB, hence it should be deployed before the connector is deployed.
+
 ```bash
 cd storage
 terraform init
@@ -38,14 +41,64 @@ terraform apply -auto-approve
 
 ## Deploy the connector
 
-```bash
-cd connector
+> Go into Dataspace Ecosystem cloned repository
+
+
+The terraform files that should be used to the deployment of the participant are in the folder: system-tests/modules/participant so refer to them.
+
+Steps to deployment:
+1. The standalone-providers.tf.disabled file should be renamed to standalone-providers.tf
+2. In the controlplane.tf add the following lines in the "config" key. You will need to add the following inside the "ingress" key (nested key insde "config"):
+
+  ```
+  "hostname": "<selfhosted_hostname>",
+  "tls": { "enabled": true, "secretName": "tls-ca"  }
+  ``` 
+
+3. Perform the same operation for the dataplanee.tf:
+  example: You will end up with something similar to this:
+  ```
+  "ingress" : {
+    "enabled" : true
+    "className" : "nginx"
+    "annotations" : {
+      "nginx.ingress.kubernetes.io/ssl-redirect" : "false"
+      "nginx.ingress.kubernetes.io/use-regex" : "true"
+      "nginx.ingress.kubernetes.io/rewrite-target" : "/api/$1$2"
+    },
+    "hostname": "<selfhosted_hostname>",
+    "tls": { "enabled": true, "secretName": "tls-ca"  }
+    ...
+  ```
+
+4. Declare your terraform.tfvars file, where you should put the value of the following variables:
+
+```
+participant_name                  = <name_of_your_connector>
+environment                       = "selfhosted"
+selfhosted_did_url                = <selfhosted_did_url>
+selfhosted_sts_url                = <selfhosted_sts_url>
+selfhosted_vault_token_secret_key = <selfhosted_vault_token_secret_key>
+selfhosted_authority_did          = <selfhosted_authority_did>
+
+# if deployed from the participants folder the charts will at root level of the repo. Otherwise, put your charts path 
+charts_path                       = "../../../charts"  
+```
+> Please refer to the variables.tf file if more information for the variables is needed
+
+5. Setting to true HTTPS communication:
+In the controlplane.tf and dataplane.tf there is a flag for HTTPS, you should set it to true:
+
+```
+"useHttps" : true
 ```
 
 ### Specify the Eona-X/EDC version
 
+> It is strongly advised to select the latest version this is an example
+
 ```bash
-EONAX_VERSION=0.4.0
+EONAX_VERSION=0.6.1
 ```
 
 ### Login to the Docker registry
@@ -70,7 +123,7 @@ for i in control-plane data-plane identity-hub telemetry-agent; do \
   ## pull the Docker image
   echo "Pulling image: $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION"; \
   podman pull --tls-verify=false $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
-# ## tag image with version latest
+  ## tag image with version latest
   echo "Tagging image as $image:latest"; \
   podman tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
   ## export image to tar file
@@ -82,7 +135,7 @@ for i in control-plane data-plane identity-hub telemetry-agent; do \
   ## verify image is loaded in kind cluster
   echo "Verifying image is loaded in kind cluster..."; \
   podman exec -it $CLUSTER-control-plane crictl images | grep $image || echo "WARNING: Image $image not found in kind cluster!"; \
-#     ## pull Helm chart
+  ## pull Helm chart
   chart=${i//-/}; \
   echo "Pulling Helm chart: $chart version $EONAX_VERSION"; \
   helm pull $HELM_CHART_REPO/$chart --version $EONAX_VERSION; \
@@ -99,11 +152,11 @@ done
 - the **Control Plane DSP url** (port 8282 of the control plane)
 - the **Data Plane public url** (port 8181 of the data plane)
 - the **Identity Hub presentation url** (port 8282 of the identity hub)
-- the **DID document url ** (port 8383 of the identity hub)
+- the **DID document url** (port 8383 of the identity hub)
 
 We strongly recommend to expose these routes through a web application firewall and implements rate limiting.
 
-Set the public facing urls in environment variables as shown below (please take of updating the values based on your
+Set the public facing urls in environment variables as shown below (please take care of updating the values based on your
 deployment topology as the ones provided below are only relevant for a local deployment).
 
 ```bash
