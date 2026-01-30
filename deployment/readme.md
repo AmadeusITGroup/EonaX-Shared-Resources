@@ -122,19 +122,19 @@ for i in control-plane data-plane identity-hub telemetry-agent; do \
   echo "Processing $image..."; \
   ## pull the Docker image
   echo "Pulling image: $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION"; \
-  podman pull --tls-verify=false $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
+  docker pull $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
   ## tag image with version latest
   echo "Tagging image as $image:latest"; \
-  podman tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
+  docker tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
   ## export image to tar file
   echo "Exporting image to /tmp/$image.tar"; \
-  podman save -o /tmp/$image.tar $image:latest; \
+  docker save -o /tmp/$image.tar $image:latest; \
   ## load image archive to the cluster
   echo "Loading image archive into kind cluster: $CLUSTER"; \
   kind load image-archive /tmp/$image.tar --name $CLUSTER ; \
   ## verify image is loaded in kind cluster
   echo "Verifying image is loaded in kind cluster..."; \
-  podman exec -it $CLUSTER-control-plane crictl images | grep $image || echo "WARNING: Image $image not found in kind cluster!"; \
+  docker exec -it $CLUSTER-control-plane crictl images | grep $image || echo "WARNING: Image $image not found in kind cluster!"; \
   ## pull Helm chart
   chart=${i//-/}; \
   echo "Pulling Helm chart: $chart version $EONAX_VERSION"; \
