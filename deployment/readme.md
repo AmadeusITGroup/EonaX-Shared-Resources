@@ -106,7 +106,7 @@ EONAX_VERSION=0.6.1
 Use the token provided by Amadeus in order to log to the Docker registry.
 
 ```bash
-echo $GITHUB_TOKEN | podman login ghcr.io -u amadeusitgroup --password-stdin
+echo $GITHUB_TOKEN | docker login ghcr.io -u amadeusitgroup --password-stdin
 echo $GITHUB_TOKEN | helm registry login ghcr.io -u amadeusitgroup --password-stdin
 ```
 
