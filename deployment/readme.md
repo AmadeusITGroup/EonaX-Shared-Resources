@@ -7,7 +7,7 @@
 - Docker desktop
 - cURL or Postman
 - Hashicorp Vault CLI
-- Cloning the DSE repository: https://github.com/AmadeusITGroup/dataspace-ecosystem/
+- [dataspace-ecosystem](https://github.com/AmadeusITGroup/dataspace-ecosystem/) repository in local  
 
 ## Create a local Kubernetes cluster
 
@@ -29,7 +29,7 @@ kubectl wait --namespace ingress-nginx \
   --timeout=90s
 ```
 
-## Deploy the Vault and DB (optional)
+## Deploy the Vault and DB
 
 > Take into account that the selfhosted connector has a dependency with the DB, hence it should be deployed before the connector is deployed.
 
@@ -42,21 +42,28 @@ terraform apply -auto-approve
 ## Deploy the connector
 
 > Go into Dataspace Ecosystem cloned repository
+```bash
+cd dataspace-ecosystem
+```
 
 
-The terraform files that should be used to the deployment of the participant are in the folder: system-tests/modules/participant so refer to them.
+The Terraform files that should be used for the deployment of the connector are in the folder _system-tests/modules/participant_.  
 
-Steps to deployment:
+```bash
+cd system-tests/modules/participant
+```
+
+Steps:
 1. The standalone-providers.tf.disabled file should be renamed to standalone-providers.tf
-2. In the controlplane.tf add the following lines in the "config" key. You will need to add the following inside the "ingress" key (nested key insde "config"):
+2. In the [controlplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/controlplane.tf) add the following lines inside the "ingress" key (nested key inside "config"):
 
   ```
   "hostname": "<selfhosted_hostname>",
   "tls": { "enabled": true, "secretName": "tls-ca"  }
   ``` 
 
-3. Perform the same operation for the dataplanee.tf:
-  example: You will end up with something similar to this:
+3. Perform the same operation for [dataplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/dataplane.tf):
+  For example: You will end up with something similar to this:
   ```
   "ingress" : {
     "enabled" : true
@@ -71,7 +78,7 @@ Steps to deployment:
     ...
   ```
 
-4. Declare your terraform.tfvars file, where you should put the value of the following variables:
+4. Create a terraform.tfvars file, with at least the following variables::
 
 ```
 participant_name                  = <name_of_your_connector>
@@ -84,18 +91,18 @@ selfhosted_authority_did          = <selfhosted_authority_did>
 # if deployed from the participants folder the charts will at root level of the repo. Otherwise, put your charts path 
 charts_path                       = "../../../charts"  
 ```
-> Please refer to the variables.tf file if more information for the variables is needed
+> Please refer to the [variables.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/variables.tf) file if more information for the variables is needed
 
-5. Setting to true HTTPS communication:
-In the controlplane.tf and dataplane.tf there is a flag for HTTPS, you should set it to true:
+5. Set HTTPS communication to true::
+  In the [controlplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/controlplane.tf) and [dataplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/dataplane.tf) there is a flag for HTTPS, you should set it to true:
 
 ```
 "useHttps" : true
 ```
 
-### Specify the Eona-X/EDC version
+### Specify the Eona-X version
 
-> It is strongly advised to select the latest version this is an example
+> Select the latest version (as of now it is *0.6.1*).
 
 ```bash
 EONAX_VERSION=0.6.1
@@ -106,6 +113,7 @@ EONAX_VERSION=0.6.1
 Use the token provided by Amadeus in order to log to the Docker registry.
 
 ```bash
+GITHUB_TOKEN="<YOUR_TOKEN_HERE>"
 echo $GITHUB_TOKEN | docker login ghcr.io -u amadeusitgroup --password-stdin
 echo $GITHUB_TOKEN | helm registry login ghcr.io -u amadeusitgroup --password-stdin
 ```
@@ -124,7 +132,7 @@ for i in control-plane data-plane identity-hub telemetry-agent; do \
   echo "Pulling image: $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION"; \
   docker pull $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
   ## tag image with version latest
-  echo "Tagging image as $image:latest"; \
+  echo "Tagging image as latest"; \
   docker tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
   ## export image to tar file
   echo "Exporting image to /tmp/$image.tar"; \
@@ -168,7 +176,7 @@ DP_PUBLIC_URL=http://localhost/dp/public
 EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
 ```
 
-Then create the `terraform.tfvars` file:
+Then create the `terraform.tfvars` file (an example of that file with the necessary content has been provided in this repository: [terraform.tfvars]()):
 
 ```bash
 cat <<EOF > terraform.tfvars
