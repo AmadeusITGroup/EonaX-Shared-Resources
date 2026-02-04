@@ -1,0 +1,28 @@
+# Terraform variables for Selfhosted Deployment
+
+# Participant Configuration for Selfhosted
+participant_name = "selfhosted"
+ 
+# Kubernetes Configuration (for standalone mode)
+kube_context     = "<kube_context>"
+kube_config_path = "<kube_config path>" #example: ~/.kube/config
+ 
+# Database Configuration
+db_server_fqdn                         = "<db_server>" 
+postgres_admin_credentials_secret_name = "<credential_secret_name>"
+ 
+# Environment Configuration
+environment          = "selfhosted"
+
+# State Machine Wait Times (in milliseconds)
+negotiation_state_machine_wait_millis      = 2000
+transfer_state_machine_wait_millis         = 2000
+policy_monitor_state_machine_wait_millis   = 5000
+data_plane_state_machine_wait_millis       = 5000
+
+# Vault Configuration
+vault_folder = ""
+ 
+# Charts Path (relative to participant module)
+charts_path = "../../../charts"
+images_prefix = "eonax-"

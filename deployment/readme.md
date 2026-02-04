@@ -54,7 +54,7 @@ cd system-tests/modules/participant
 ```
 
 Steps:
-1. The standalone-providers.tf.disabled file should be renamed to standalone-providers.tf
+1. The [standalone-providers.tf.disabled](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/standalone-providers.tf.disabled) file should be renamed to standalone-providers.tf
 2. In the [controlplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/controlplane.tf) add the following lines inside the "ingress" key (nested key inside "config"):
 
   ```
@@ -142,7 +142,7 @@ for i in control-plane data-plane identity-hub telemetry-agent; do \
   kind load image-archive /tmp/$image.tar --name $CLUSTER ; \
   ## verify image is loaded in kind cluster
   echo "Verifying image is loaded in kind cluster..."; \
-  docker exec -it $CLUSTER-control-plane crictl images | grep $image || echo "WARNING: Image $image not found in kind cluster!"; \
+  docker exec -it $CLUSTER-control-plane crictl images | grep $image || { echo "ERROR: Image $image not found in kind cluster!"; exit 1; }; \
   ## pull Helm chart
   chart=${i//-/}; \
   echo "Pulling Helm chart: $chart version $EONAX_VERSION"; \
@@ -176,7 +176,7 @@ DP_PUBLIC_URL=http://localhost/dp/public
 EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
 ```
 
-Then create the `terraform.tfvars` file (an example of that file with the necessary content has been provided in this repository: [terraform.tfvars]()):
+Then create the `terraform.tfvars` file (an example of that file with the necessary content has been provided in this repository: [terraform.tfvars.example](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/blob/main/deployment/terraform.tfvars)):
 
 ```bash
 cat <<EOF > terraform.tfvars
