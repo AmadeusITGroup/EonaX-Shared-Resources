@@ -102,7 +102,7 @@ charts_path                       = "../../../charts"
 
 ### Specify the Eona-X version
 
-> Select the latest version (as of now it is *0.6.1*).
+> Select the version *0.6.1*.
 
 ```bash
 EONAX_VERSION=0.6.1
