@@ -89,7 +89,13 @@ selfhosted_vault_token_secret_key = <selfhosted_vault_token_secret_key>
 selfhosted_authority_did          = <selfhosted_authority_did>
 
 # if deployed from the participants folder the charts will at root level of the repo. Otherwise, put your charts path 
-charts_path                       = "../../../charts"  
+charts_path                       = "../../../charts"
+
+# Container Images for Self-Hosted Environments
+control_plane_image               = "eonax-control-plane-postgresql-hashicorpvault"
+data_plane_image                  = "eonax-data-plane-postgresql-hashicorpvault"
+identity_hub_image                = "eonax-identity-hub-postgresql-hashicorpvault"
+telemetry_agent_image             = "eonax-telemetry-agent-postgresql-hashicorpvault"
 ```
 > Please refer to the [variables.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/variables.tf) file if more information for the variables is needed
 

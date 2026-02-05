@@ -25,4 +25,9 @@ vault_folder = ""
  
 # Charts Path (relative to participant module)
 charts_path = "../../../charts"
-images_prefix = "eonax-"
+
+# Container Images for Self-Hosted Environments
+control_plane_image      = "eonax-control-plane-postgresql-hashicorpvault"
+data_plane_image         = "eonax-data-plane-postgresql-hashicorpvault"
+identity_hub_image       = "eonax-identity-hub-postgresql-hashicorpvault"
+telemetry_agent_image    = "eonax-telemetry-agent-postgresql-hashicorpvault"
