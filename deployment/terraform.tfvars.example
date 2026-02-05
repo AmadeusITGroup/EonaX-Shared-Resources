@@ -1,7 +1,7 @@
 # Terraform variables for Selfhosted Deployment
 
 # Participant Configuration for Selfhosted
-participant_name = "selfhosted"
+participant_name = "your-participant-name"
  
 # Kubernetes Configuration (for standalone mode)
 kube_context     = "<kube_context>"
