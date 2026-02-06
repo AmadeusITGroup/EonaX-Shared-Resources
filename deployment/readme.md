@@ -108,10 +108,10 @@ telemetry_agent_image             = "eonax-telemetry-agent-postgresql-hashicorpv
 
 ### Specify the Eona-X version
 
-> Select the version *0.6.1*.
+> Select the version *0.6.3*.
 
 ```bash
-EONAX_VERSION=0.6.2
+EONAX_VERSION=0.6.3
 ```
 
 ### Login to the Docker registry
