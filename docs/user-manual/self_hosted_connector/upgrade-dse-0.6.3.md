@@ -1,5 +1,5 @@
 ## Overview: 
-The new version of dse-0.6.3 includes the newer version of EDC V 0.14. This new version of EDC has included some breaking changes and DB schema changes. This document will guide you through the steps to upgrade your existing dse-0.5.18 to dse-0.6.3 and above. 
+The new version of DSE **0.6.3** includes the newer version of EDC v0.14: this includes some breaking changes, including DB schema. This document will guide you through the steps to upgrade a self-hosted connector from the previous version 0.5.x to 0.6.3. 
 
 ## Upgrade Steps:
 1. Backup your existing PostgreSQL database. This is crucial to prevent data loss during the upgrade process.
