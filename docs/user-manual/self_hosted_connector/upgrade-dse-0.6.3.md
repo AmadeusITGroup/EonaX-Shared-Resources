@@ -48,6 +48,5 @@ The new version of DSE **0.6.3** includes the newer version of EDC v0.14: this i
     ADD COLUMN resource_definitions json DEFAULT '[]'::json;
     COMMIT;
     ```
-    This script is also available in the open source [repository](https://github.com/AmadeusITGroup/Dataspace_Ecosystem/blob/master/sql-migrations-v0.14/participant-migration.sql)
 
 3. Update your connector deployment to use the new dse-0.6.3 image. 
