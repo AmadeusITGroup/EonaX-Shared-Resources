@@ -7,6 +7,7 @@
 - Docker desktop
 - cURL or Postman
 - Hashicorp Vault CLI
+- [dataspace-ecosystem](https://github.com/AmadeusITGroup/dataspace-ecosystem/) repository in local  
 
 ## Create a local Kubernetes cluster
 
@@ -28,7 +29,9 @@ kubectl wait --namespace ingress-nginx \
   --timeout=90s
 ```
 
-## Deploy the Vault and DB (optional)
+## Deploy the Vault and DB
+
+> Take into account that the selfhosted connector has a dependency with the DB, hence it should be deployed before the connector is deployed.
 
 ```bash
 cd storage
@@ -38,14 +41,77 @@ terraform apply -auto-approve
 
 ## Deploy the connector
 
+> Go into Dataspace Ecosystem cloned repository
 ```bash
-cd connector
+cd dataspace-ecosystem
 ```
 
-### Specify the Eona-X/EDC version
+
+The Terraform files that should be used for the deployment of the connector are in the folder _system-tests/modules/participant_.  
 
 ```bash
-EONAX_VERSION=0.4.0
+cd system-tests/modules/participant
+```
+
+Steps:
+1. The [standalone-providers.tf.disabled](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/standalone-providers.tf.disabled) file should be renamed to standalone-providers.tf
+2. In the [controlplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/controlplane.tf) add the following lines inside the "ingress" key (nested key inside "config"):
+
+  ```
+  "hostname": "<selfhosted_hostname>",
+  "tls": { "enabled": true, "secretName": "tls-ca"  }
+  ``` 
+
+3. Perform the same operation for [dataplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/dataplane.tf):
+  For example: You will end up with something similar to this:
+  ```
+  "ingress" : {
+    "enabled" : true
+    "className" : "nginx"
+    "annotations" : {
+      "nginx.ingress.kubernetes.io/ssl-redirect" : "false"
+      "nginx.ingress.kubernetes.io/use-regex" : "true"
+      "nginx.ingress.kubernetes.io/rewrite-target" : "/api/$1$2"
+    },
+    "hostname": "<selfhosted_hostname>",
+    "tls": { "enabled": true, "secretName": "tls-ca"  }
+    ...
+  ```
+
+4. Create a terraform.tfvars file, with at least the following variables::
+
+```
+participant_name                  = <name_of_your_connector>
+environment                       = "selfhosted"
+selfhosted_did_url                = <selfhosted_did_url>
+selfhosted_sts_url                = <selfhosted_sts_url>
+selfhosted_vault_token_secret_key = <selfhosted_vault_token_secret_key>
+selfhosted_authority_did          = <selfhosted_authority_did>
+
+# if deployed from the participants folder the charts will at root level of the repo. Otherwise, put your charts path 
+charts_path                       = "../../../charts"
+
+# Container Images for Self-Hosted Environments
+control_plane_image               = "eonax-control-plane-postgresql-hashicorpvault"
+data_plane_image                  = "eonax-data-plane-postgresql-hashicorpvault"
+identity_hub_image                = "eonax-identity-hub-postgresql-hashicorpvault"
+telemetry_agent_image             = "eonax-telemetry-agent-postgresql-hashicorpvault"
+```
+> Please refer to the [variables.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/variables.tf) file if more information for the variables is needed
+
+5. Set HTTPS communication to true::
+  In the [controlplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/controlplane.tf) and [dataplane.tf](https://github.com/AmadeusITGroup/dataspace-ecosystem/blob/main/system-tests/modules/participant/dataplane.tf) there is a flag for HTTPS, you should set it to true:
+
+```
+"useHttps" : true
+```
+
+### Specify the Eona-X version
+
+> Select the version *0.6.1*.
+
+```bash
+EONAX_VERSION=0.6.2
 ```
 
 ### Login to the Docker registry
@@ -55,6 +121,7 @@ Use the token provided by Amadeus in order to log to the Docker registry.
 ```bash
 GITHUB_TOKEN="<YOUR_TOKEN_HERE>"
 echo $GITHUB_TOKEN | docker login ghcr.io -u amadeusitgroup --password-stdin
+echo $GITHUB_TOKEN | helm registry login ghcr.io -u amadeusitgroup --password-stdin
 ```
 
 ### Pull Helm chart and Docker images
@@ -62,22 +129,33 @@ echo $GITHUB_TOKEN | docker login ghcr.io -u amadeusitgroup --password-stdin
 ```bash
 CLUSTER=eonax-cluster
 DOCKER_IMAGE_REPO=ghcr.io/amadeusitgroup/dataspace_ecosystem
-HELM_CHART_REPO=oci://ghcr.io/amadeusitgroup/dataspace_ecosystem/helm
+HELM_CHART_REPO=oci://ghcr.io/amadeusitgroup/dataspace_ecosystem/helm/charts
 
-for i in control-plane data-plane identity-hub; do \
+for i in control-plane data-plane identity-hub telemetry-agent; do \
   image=eonax-$i-postgresql-hashicorpvault; \
-  
+  echo "Processing $image..."; \
   ## pull the Docker image
+  echo "Pulling image: $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION"; \
   docker pull $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION; \
   ## tag image with version latest
+  echo "Tagging image as latest"; \
   docker tag $DOCKER_IMAGE_REPO/$image:$EONAX_VERSION $image:latest; \
-  ## load image to the cluster
-  kind load docker-image $image:latest --name $CLUSTER; \
-  
+  ## export image to tar file
+  echo "Exporting image to /tmp/$image.tar"; \
+  docker save -o /tmp/$image.tar $image:latest; \
+  ## load image archive to the cluster
+  echo "Loading image archive into kind cluster: $CLUSTER"; \
+  kind load image-archive /tmp/$image.tar --name $CLUSTER ; \
+  ## verify image is loaded in kind cluster
+  echo "Verifying image is loaded in kind cluster..."; \
+  docker exec -it $CLUSTER-control-plane crictl images | grep $image || { echo "ERROR: Image $image not found in kind cluster!"; exit 1; }; \
   ## pull Helm chart
   chart=${i//-/}; \
+  echo "Pulling Helm chart: $chart version $EONAX_VERSION"; \
   helm pull $HELM_CHART_REPO/$chart --version $EONAX_VERSION; \
   mv $chart-$EONAX_VERSION.tgz $chart.tgz; \
+  echo "Completed processing $image"; \
+  echo "---"; \
 done
 ```
 
@@ -88,11 +166,11 @@ done
 - the **Control Plane DSP url** (port 8282 of the control plane)
 - the **Data Plane public url** (port 8181 of the data plane)
 - the **Identity Hub presentation url** (port 8282 of the identity hub)
-- the **DID document url ** (port 8383 of the identity hub)
+- the **DID document url** (port 8383 of the identity hub)
 
 We strongly recommend to expose these routes through a web application firewall and implements rate limiting.
 
-Set the public facing urls in environment variables as shown below (please take of updating the values based on your
+Set the public facing urls in environment variables as shown below (please take care of updating the values based on your
 deployment topology as the ones provided below are only relevant for a local deployment).
 
 ```bash
@@ -104,7 +182,7 @@ DP_PUBLIC_URL=http://localhost/dp/public
 EONAX_DID_WEB=did:web:test.api.eona-x.dataspace-platform.amadeus.com:ih:did:authority
 ```
 
-Then create the `terraform.tfvars` file:
+Then create the `terraform.tfvars` file (an example of that file with the necessary content has been provided in this repository: [terraform.tfvars.example](https://github.com/AmadeusITGroup/EonaX-Shared-Resources/blob/main/deployment/terraform.tfvars)):
 
 ```bash
 cat <<EOF > terraform.tfvars
