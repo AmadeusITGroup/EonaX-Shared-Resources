@@ -129,7 +129,7 @@ echo $GITHUB_TOKEN | helm registry login ghcr.io -u amadeusitgroup --password-st
 ```bash
 CLUSTER=eonax-cluster
 DOCKER_IMAGE_REPO=ghcr.io/amadeusitgroup/dataspace_ecosystem
-HELM_CHART_REPO=oci://ghcr.io/amadeusitgroup/dataspace_ecosystem/helm
+HELM_CHART_REPO=oci://ghcr.io/amadeusitgroup/dataspace_ecosystem/helm/charts
 
 for i in control-plane data-plane identity-hub telemetry-agent; do \
   image=eonax-$i-postgresql-hashicorpvault; \
