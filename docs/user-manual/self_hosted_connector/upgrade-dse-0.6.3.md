@@ -4,7 +4,7 @@ The new version of DSE **0.6.3** includes the newer version of EDC v0.14: this i
 ## Upgrade Steps:
 1. Backup your existing PostgreSQL database. This is crucial to prevent data loss during the upgrade process.
 
-2. Run the migration scripts provided in the dse-0.6.3 release. These scripts will update your database schema to be compatible with the new version of EDC.
+2. Run the migration script provided below. These commands will update your database schema to be compatible with EDC v0.14, integrated in DSE v0.6.3.
 
     ``` SQL
     BEGIN;
