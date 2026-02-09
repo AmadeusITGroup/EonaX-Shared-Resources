@@ -49,4 +49,4 @@ The new version of DSE **0.6.3** includes the newer version of EDC v0.14: this i
     COMMIT;
     ```
 
-3. Update your connector deployment to use the new dse-0.6.3 image. 
+3. Update your connector to use DSE v0.6.3 images. 
