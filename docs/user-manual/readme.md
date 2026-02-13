@@ -10,9 +10,81 @@ In order to complete this guide, you will need few infos that will be provided b
 
 - the base url for targeting your respective connector, referred as `<CONNECTOR_URL>` hereafter,
 - the base url for targeting the federated catalog, referred as `<CATALOG_URL>` hereafter,
-- a token for authenticating to your respective connector APIs
-- a token for authenticating to the dataspace federated catalog
+- OAuth 2.0 credentials (Client ID, Client Secret, Auth URL, Access Token URL, and required scopes) for JWT token authentication to your respective connector APIs and the dataspace federated catalog
 
+## About This Guide
+
+This guide is intended for **dataset providers** , **dataset consumers** and **developers** who need to interact with the EonaX Connector APIs. By following this documentation, you will learn how to:
+
+- Generate JWT tokens using OAuth 2.0 with PKCE authentication in Postman
+- Create and manage datasets, policies, and contracts in the EonaX dataspace
+- Negotiate contracts and transfer data between participants
+- Consume data from other participants in the dataspace
+
+The guide assumes basic familiarity with REST APIs and authentication concepts. All necessary credentials and configuration details will be provided by Amadeus.
+
+## JWT Token Generation with Postman [(PKCE Authentication)](https://blog.postman.com/what-is-pkce/)
+
+Follow these steps to configure JWT token authentication in Postman:
+
+### Step 1: Configure OAuth 2.0 in Postman
+
+1. **Open Postman Authorization Tab**
+   - Navigate to your collection or request
+   - Click on the "Authorization" tab
+   - Select "OAuth 2.0" from the Type dropdown
+
+   ![Postman OAuth 2.0 Selection](examples-jwt/Authorization_tab.png)
+### Step 2: Configure PKCE Authentication
+
+2. **Choose Authorization Code (With PKCE)**
+   - Set Grant Type to "Authorization Code (With PKCE)"
+   - Configure the following parameters (provided by Amadeus):,
+     - **Auth URL**: `https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/authorize`
+     - **Access Token URL**: `https://login.microsoftonline.com/<tenant_id>/oauth2/v2.0/token`
+     - **Client ID**: Your registered application client ID 
+     - **Client Secret**: Your registered application client Secret 
+     - **Code Challenge Method**: `SHA256`
+     - **Scope**: Required scopes
+
+   ![Postman PKCE Configuration](examples-jwt/configure_new_token.png)
+### Step 3: Generate Access Token
+
+3. **Initiate Token Generation**
+   - Click "Get New Access Token" to start the authentication flow
+
+   ![Get New Access Token](examples-jwt/Get_New_Access_Token.png)
+### Step 4: Browser Authentication
+
+4. **Complete Authentication in Browser**
+   - Postman will open a browser window for authentication
+   - Log in with your EonaX credentials
+   - Authorize the application access
+
+   ![Browser Authentication Page 1](examples-jwt/redirect.png)
+   ![Browser Authentication Page 2](examples-jwt/authentication_complete.png)
+### Step 5: Token Generated
+
+5. **JWT Token Ready**
+   - After successful authentication, the JWT token will be automatically generated
+   - The token will be available in Postman for use in API requests
+   - Token refresh will be handled automatically by Postman
+    ![Token Generated](examples-jwt/token_generated.png)
+### Before (API Key - Deprecated)
+```http
+GET /management/v3/assets
+Host: <CONNECTOR_URL>
+x-api-key: your-static-api-key
+Content-Type: application/json
+```
+
+### After (JWT Token - Required)
+```http
+GET /management/v3/assets
+Host: <CONNECTOR_URL>
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+```
 ## Steps for a participant to create a new dataset
 
 All queries detailed in this section are based on
@@ -20,7 +92,7 @@ the [Swagger specification](https://eclipse-edc.github.io/Connector/openapi/mana
 the EDC
 connector.
 
-They require a `x-api-key` header in input containing the token provided by Amadeus to interact with your connector.
+They require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact with your connector.
 
 ### Create dataset
 
@@ -335,7 +407,8 @@ definition:
 ## Dataset discovery
 
 This section is not correlated with the first one, i.e. we are not using the dataset created in the first section.
-All APIs from this section requires a x-api-key header in input containing the token provided by Amadeus to interact
+
+All APIs from this section require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact
 with the dataspace federated catalog.
 
 ### Federated catalog
@@ -422,7 +495,8 @@ finally how to consume the data represented by this dataset.
 
 This section is not correlated with the first one, i.e. we are not using the dataset created in the first section.
 All queries detailed in this section are based on the Swagger specification of the Management API of the EDC connector.
-All APIs from this section requires a `x-api-key` header in input containing the token provided by Amadeus to interact
+
+All APIs from this section require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact
 with your connector.
 
 ### Contract negotiation
@@ -650,7 +724,7 @@ This is achieved by targeting a proxy API of the consumer Data Plane, that enabl
 request. These query/path parameters are then forwarded to the provider Data Plane, which finally send them to the
 actual data source.
 
-All APIs from this section requires a `x-api-key` header in input containing the token provided by Amadeus to interact
+All APIs from this section require an `Authorization: Bearer <jwt_token>` header in input containing the JWT token provided by Amadeus to interact
 with your connector. You must also provide the contract id obtained in the previous section in the `Contract-Id` header.
 
 #### Url
@@ -687,3 +761,21 @@ proxying of query/path parameters for this dataset), e.g. `<CONNECTOR_URL>/dp/da
 | Le Petit Fute                                                       | petitfute                 |
 | Atout France                                                        | atoutfrance               |
 | Metropole De Nice                                                   | metropoledenice           |
+
+## ⚠️ DEPRECATED: API Key Authentication Method
+
+> **WARNING**: The following authentication method using `x-api-key` header is **DEPRECATED** and will be removed in a future release.
+>
+> **Please migrate to JWT token authentication** as documented in the main sections above.
+>
+> **Deprecation Notice**: This section is maintained for reference only for users who have not yet migrated.
+
+### Deprecated API Key Usage
+
+The old authentication method used a static API key:
+
+```http
+POST /cp/mgmt/v3/assets
+Host: <CONNECTOR_URL>
+x-api-key: your-static-api-key
+Content-Type: application/json
