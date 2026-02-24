@@ -672,18 +672,20 @@ proxying of query/path parameters for this dataset), e.g. `<CONNECTOR_URL>/dp/da
 
 ## Appendix
 
-### Eona-X participants ids as of 13 DEC 2024
+### Eona-X participants ids as of Mar 4, 2025
 
-| Participant name                                                    | ID                        |
----------------------------------------------------------------------|---------------------------|
-| Aeroport de Paris                                                   | aeroportdeparis           |
-| Apidae                                                              | apidae                    |
-| Amadeus                                                             | amadeus                   |
-| Direction de la transformation numerique (ministere de l’interieur) | dnum                      |
-| Eonax test participant                                              | eonaxtest                 |
-| Renault                                                             | renault                   |
-| SNCF                                                                | sncf                      |
-| Aeroport Marseille Provence                                         | aeroportmarseilleprovence |
-| Le Petit Fute                                                       | petitfute                 |
-| Atout France                                                        | atoutfrance               |
-| Metropole De Nice                                                   | metropoledenice           |
+| Participant name                                                        | ID                        |
+|-------------------------------------------------------------------------|---------------------------|
+| Aeroport de Paris                                                       | aeroportdeparis           |
+| Apidae                                                                  | apidae                    |
+| Amadeus                                                                 | amadeus                   |
+| Direction de la transformation numerique (ministere de l’interieur)     | dnum                      |
+| Eonax test participant                                                  | eonaxtest                 |
+| Renault                                                                 | renault                   |
+| SNCF                                                                    | sncf                      |
+| Aeroport Marseille Provence                                             | aeroportmarseilleprovence |
+| Le Petit Fute                                                           | petitfute                 |
+| Atout France                                                            | atoutfrance               |
+| Metropole De Nice                                                       | metropoledenice           |
+| AnySolution                                                             | anysolution               |
+| Direction Générale des Infrastructures, des Transports et des Mobilités | dgitm                     |
